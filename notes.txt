@@ -1,0 +1,14 @@
+GET all bookings:
+curl -v localhost:8080/bookings
+
+POST new bookingEntity:
+curl -v -X POST localhost:8080/bookings -H "Content-Type: application/json" -d '{"email":"damian1@mailinator.com","fullName":"Damian1","arrivalDate":"2020-03-01","departureDate":"2020-03-10", "dates": {"arrival":"2021-01-01", "departure":"2021-02-01"}}'
+
+PUT bookingEntity
+curl -v -X PUT localhost:8080/bookings/3 -H 'Content-Type:application/json' -d '{"email":"damian1@mailinator.com","fullName":"Damian1","arrivalDate":"2020-03-01","departureDate":"2020-03-10"}'
+
+DELETE bookingEntity
+curl -v -X DELETE localhost:8080/bookings/3
+
+GET bookingEntity
+curl -v localhost:8080/bookings/99
