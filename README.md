@@ -108,7 +108,8 @@ Note: Unnecessary use of -X or --request, POST is already inferred.
 > 
 * upload completely sent off: 108 out of 108 bytes
 * Mark bundle as not supporting multiuse
-< HTTP/1.1 200 
+< HTTP/1.1 201 
+< Location: http://localhost:8080/bookings/1
 < Content-Type: application/json
 < Transfer-Encoding: chunked
 < Date: Mon, 13 Jan 2020 04:28:47 GMT

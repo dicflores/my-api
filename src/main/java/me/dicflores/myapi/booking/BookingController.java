@@ -2,10 +2,13 @@ package me.dicflores.myapi.booking;
 
 import me.dicflores.myapi.exception.ApiEntityNotFoundException;
 import me.dicflores.myapi.exception.ApiIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.net.URI;
 import java.util.Collection;
 
 @RestController
@@ -28,9 +31,13 @@ public class BookingController {
     }
 
     @PostMapping()
-    public Booking create(@Valid @RequestBody Booking booking) throws ApiIntegrityViolationException {
-        return bookingService.createBooking(booking);
-        // TODO Retornar 201 (usando HATEOAS, o ResponseEntity
+    public ResponseEntity<Booking> create(@Valid @RequestBody Booking booking) throws ApiIntegrityViolationException {
+        Booking savedBooking = bookingService.createBooking(booking);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedBooking.getId()).toUri();
+
+        return ResponseEntity.created(location).body(savedBooking);
     }
 
     @PutMapping("/{id}")
