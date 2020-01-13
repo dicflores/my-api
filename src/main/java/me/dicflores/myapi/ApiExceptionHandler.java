@@ -4,6 +4,7 @@ import me.dicflores.myapi.apierror.ApiError;
 import me.dicflores.myapi.apierror.ApiValidationError;
 import me.dicflores.myapi.exception.ApiEntityNotFoundException;
 import me.dicflores.myapi.exception.ApiIntegrityViolationException;
+import me.dicflores.myapi.exception.ApiInvalidCalendarRangeException;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -33,6 +34,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiIntegrityViolationException.class)
     protected ResponseEntity<Object> handleApiIntegrityViolation(ApiIntegrityViolationException ex) {
         ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getMessage(), null);
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(ApiInvalidCalendarRangeException.class)
+    protected ResponseEntity<Object> handleApiInvalidCalendarRange(ApiInvalidCalendarRangeException ex) {
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
         return buildResponseEntity(apiError);
     }
 
