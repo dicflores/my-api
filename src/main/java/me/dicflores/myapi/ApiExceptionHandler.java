@@ -11,8 +11,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -95,6 +97,44 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             apiError.getSubErrors().add(subError);
         }
 
+        return buildResponseEntity(apiError);
+    }
+
+    /**
+     * Handle MissingServletRequestParameterException. Triggered when a 'required' request parameter is missing.
+     * @param ex
+     * @param headers
+     * @param status
+     * @param request
+     * @return
+     */
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+        MissingServletRequestParameterException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request
+    ) {
+        String error = String.format("%s parameter is missing.", ex.getParameterName());
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
+    /**
+     * Handle HttpMessageNotReadableException. Happens when request JSON is malformed.
+     * @param ex
+     * @param headers
+     * @param status
+     * @param request
+     * @return
+     */
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+        HttpMessageNotReadableException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request
+    ) {
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Malformed JSON request", ex);
         return buildResponseEntity(apiError);
     }
 
