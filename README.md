@@ -16,6 +16,14 @@ There is a campsite which is available to be reserved. This campsite is small, s
   - Given a booking identifier, users may get details of a reservation.
   - Provide appropiate error messages to indicate error cases.
 
+## Date ranges
+Both arrival and departure dates are inclusive. Samples:
+| Arrival | Departure | Number of days |
+| --------| --------- | -------------- |
+| 2020-01-15 | 2020-01-15 | 1 (Only Jan-15) |
+| 2020-01-15 | 2020-01-16 | 2 (Jan-15 and 16) |
+| 2020-01-15 | 2020-01-17 | 3 (Jan-15, 16 and 17) |
+
 ## Tools
 The following tools/frameworks were used:
   - Spring Boot
