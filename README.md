@@ -18,6 +18,7 @@ There is a campsite which is available to be reserved. This campsite is small, s
 
 ## Date ranges
 Both arrival and departure dates are inclusive. Samples:
+
 | Arrival | Departure | Number of days |
 | --------| --------- | -------------- |
 | 2020-01-15 | 2020-01-15 | 1 (Only Jan-15) |
