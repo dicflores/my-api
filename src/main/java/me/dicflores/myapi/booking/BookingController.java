@@ -32,7 +32,12 @@ public class BookingController {
 
     @PostMapping()
     public ResponseEntity<Booking> create(@Valid @RequestBody Booking booking) throws ApiIntegrityViolationException {
-        Booking savedBooking = bookingService.createBooking(booking);
+        Booking savedBooking;
+        try {
+            savedBooking = bookingService.create(booking);
+        } catch (RuntimeException rte) {
+            throw new ApiIntegrityViolationException(booking.getDates().getArrival(), booking.getDates().getDeparture());
+        }
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedBooking.getId()).toUri();
@@ -45,11 +50,17 @@ public class BookingController {
         @PathVariable @Positive Long id,
         @Valid @RequestBody Booking booking
     ) throws ApiEntityNotFoundException, ApiIntegrityViolationException {
-        return bookingService.updateBooking(id, booking);
+        Booking savedBooking;
+        try {
+            savedBooking = bookingService.update(id, booking);
+        } catch (RuntimeException rte) {
+            throw new ApiIntegrityViolationException(booking.getDates().getArrival(), booking.getDates().getDeparture());
+        }
+        return savedBooking;
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) throws ApiEntityNotFoundException {
-        bookingService.deleteBooking(id);
+        bookingService.delete(id);
     }
 }

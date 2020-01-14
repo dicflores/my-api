@@ -1,10 +1,13 @@
 package me.dicflores.myapi.booking;
 
-
 import me.dicflores.myapi.calendar.CalendarRepository;
 import me.dicflores.myapi.exception.ApiEntityNotFoundException;
 import me.dicflores.myapi.exception.ApiIntegrityViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -15,10 +18,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-
 @Service
 @Validated
 public class BookingService {
+    private final Logger log = LoggerFactory.getLogger(BookingService.class);
     private final BookingRepository bookingRepository;
     private final CalendarRepository calendarRepository;
 
@@ -42,26 +45,24 @@ public class BookingService {
         return bookingRepository.findById(id).orElseThrow(() -> new ApiEntityNotFoundException(BookingEntity.class, "id", String.valueOf(id)));
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public Booking createBooking(@Valid Booking booking) throws ApiIntegrityViolationException {
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
+    public Booking create(@Valid Booking booking) throws ApiIntegrityViolationException {
         Booking.Dates dates = booking.getDates();
         LocalDate from = dates.getArrival();
         LocalDate to = dates.getDeparture();
 
-        Long availableCount = calendarRepository.getAvailableDatesCount(from, to);
-        if (availableCount != daysCount(from, to)) {
-            throw new ApiIntegrityViolationException(from, to);
-        }
-
         BookingEntity entity = bookingRepository.save(toEntity(booking));
 
-        calendarRepository.markReservedDates(entity.getId(), entity.getArrivalDate(), entity.getDepartureDate());
-
+        int actualCount = calendarRepository.markReservedDates(entity.getId(), entity.getArrivalDate(), entity.getDepartureDate());
+        if (actualCount != daysCount(from, to)) {
+            log.info("Could not reserve all dates on calendar.");
+            throw new ApiIntegrityViolationException(from, to);
+        }
         return toResource(entity);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public Booking updateBooking(@NotNull Long id, @Valid Booking booking) throws ApiEntityNotFoundException, ApiIntegrityViolationException {
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
+    public Booking update(@NotNull Long id, @Valid Booking booking) throws ApiEntityNotFoundException, ApiIntegrityViolationException {
         BookingEntity entity = getEntity(id);
         LocalDate oldFrom = entity.getArrivalDate();
         LocalDate oldTo = entity.getDepartureDate();
@@ -71,8 +72,9 @@ public class BookingService {
         LocalDate newFrom = dates.getArrival();
         LocalDate newTo = dates.getDeparture();
 
-        Long availableCount = calendarRepository.getAvailableDatesCount(newFrom, newTo);
-        if (availableCount != daysCount(newFrom, newTo)) {
+        int actualCount = calendarRepository.markReservedDates(id, newFrom, newTo);
+        if (actualCount != daysCount(newFrom, newTo)) {
+            log.info("Could not reserve all dates on calendar.");
             throw new ApiIntegrityViolationException(newFrom, newTo);
         }
 
@@ -81,14 +83,13 @@ public class BookingService {
         entity.setArrivalDate(newFrom);
         entity.setDepartureDate(newTo);
 
-        entity = bookingRepository.save(entity);
-        calendarRepository.markReservedDates(entity.getId(), newFrom, newTo);
+        bookingRepository.save(entity);
 
         return toResource(entity);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteBooking(@NotNull Long id) throws ApiEntityNotFoundException {
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
+    public void delete(@NotNull Long id) throws ApiEntityNotFoundException {
         BookingEntity entity = getEntity(id);
 
         LocalDate from = entity.getArrivalDate();

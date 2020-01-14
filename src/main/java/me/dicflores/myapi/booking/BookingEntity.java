@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public class BookingEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
 
