@@ -3,6 +3,7 @@ package me.dicflores.myapi.booking;
 import me.dicflores.myapi.exception.ApiEntityNotFoundException;
 import me.dicflores.myapi.exception.ApiIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -13,6 +14,7 @@ import java.util.Collection;
 
 @RestController
 @RequestMapping("/bookings")
+@Validated
 public class BookingController {
     private final BookingService bookingService;
 
@@ -26,7 +28,7 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
-    public Booking get(@PathVariable Long id) throws ApiEntityNotFoundException {
+    public Booking get(@PathVariable @Positive Long id) throws ApiEntityNotFoundException {
         return bookingService.get(id);
     }
 
@@ -60,7 +62,7 @@ public class BookingController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) throws ApiEntityNotFoundException {
+    public void delete(@PathVariable @Positive Long id) throws ApiEntityNotFoundException {
         bookingService.delete(id);
     }
 }
