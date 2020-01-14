@@ -33,8 +33,20 @@ The following tools/frameworks were used:
   - Maven
   - JUnit
   - Spring Test
-  
+
 ## Setup
+### Persistence
+The project uses MySQL for persistence. Make sure a Database named `myapi` is created.
+Connection details can be set on application.properties file. Default values are:
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/myapi
+spring.datasource.username=root
+spring.datasource.password=
+```
+By convenience, tables are re-created on application startup.
+
+### Run
 To run/execute the Spring Boot application, first package the whole project into a single .jar file:
 
 ```shell script
