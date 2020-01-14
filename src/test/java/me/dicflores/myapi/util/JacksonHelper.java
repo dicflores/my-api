@@ -1,6 +1,7 @@
 package me.dicflores.myapi.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.dicflores.myapi.booking.Booking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,5 +26,9 @@ public class JacksonHelper {
         StringWriter writer = new StringWriter();
         jackson.writeValue(writer, collection);
         return writer.toString();
+    }
+
+    public Booking fromJson(String json) throws Exception {
+        return jackson.readValue(json, Booking.class);
     }
 }
