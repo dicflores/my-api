@@ -92,7 +92,7 @@ public class CalendarControllerIntegrationTest {
     }
 
     private CompletableFuture<ResponseEntity<String>> [] getMultipleRequests(String urlString) {
-        int n = 200;
+        int n = 100;
         // Define a fixed Thread Pool of n threads.
         Executor executor = Executors.newFixedThreadPool(n);
 
