@@ -33,6 +33,18 @@ The following tools/frameworks were used:
   - Maven
   - JUnit
   - Spring Test
+  
+## Setup
+To run/execute the Spring Boot application, first package the whole project into a single .jar file:
+
+```shell script
+$ mvn clean package 
+```
+After all dependencies are downloaded and packaged together and build succeeded, simply execute the generated jar on a terminal:
+
+```shell script
+$ java -jar target/my-api-1.0-SNAPSHOT.jar
+```
 
 ## Operations
 ### Summary Table
