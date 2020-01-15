@@ -217,3 +217,60 @@ curl -v -X DELETE localhost:8080/bookings/1
 < 
 * Connection #0 to host localhost left intact
 ```
+
+## API Errors
+In case of any error processing the user request, a corresponding HTTP status code is returned, along with a JSON message with further information.
+The general form of such a payload is as follow:
+```json
+{
+  "httpStatus": "CONFLICT",
+  "timestamp": "2020-01-14T23:14:46.178772",
+  "message": "One or more date(s) of requested range [2020-01-19 to 2020-01-21] is(are) no longer available.",
+  "debugMessage": null,
+  "subErrors": []
+}
+```
+
+| Field | Description |
+| ----- | ----------- |
+| **httpStatus** | Status of current request. It matches the returned HTTP Code |
+| **timestamp** | Date and time of this error |
+| **message** | Description of the error condition |
+| **debugMessage** | (Optional) Further information message |
+| **subErrors** | (Optional) Collection of objects indicating detailed description. Currently used to specify validation errors. |
+
+### Samples
+Validation error for Create/Update booking:
+```json
+{
+  "httpStatus": "BAD_REQUEST",
+  "timestamp": "2020-01-14T23:26:15.016703",
+  "message": "Validation error",
+  "debugMessage": null,
+  "subErrors": [
+    {
+      "object": "booking",
+      "field": "dates.arrival",
+      "rejectedValue": "2020-01-14",
+      "message": "must be a future date"
+    },
+    {
+      "object": "booking",
+      "field": "dates.arrival",
+      "rejectedValue": "2020-01-14",
+      "message": "Campsite can be reserved minimum 1 day ahead of arrival and up to 1 month in advance."
+    }
+  ]
+}
+```
+
+Editing/Removing an invalid booking Id:
+```json
+{
+  "httpStatus": "NOT_FOUND",
+  "timestamp": "2020-01-14T23:30:29.664371",
+  "message": "BookingEntity was not found for parameters {id=43}",
+  "debugMessage": null,
+  "subErrors": []
+}
+```
